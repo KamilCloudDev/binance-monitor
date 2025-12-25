@@ -64,9 +64,23 @@ def main():
                     # First run, send the most recent trade immediately
                     last_trade_id = current_trade_id
                     print(f"Initial trade ID set to: {last_trade_id}. Sending last known trade.", flush=True)
-                    
+
+                    # --- Message Formatting ---
+                    price_pln = float(current_trade['price'])
+                    qty_btc = float(current_trade['qty'])
                     side = "KUPNO" if current_trade['isBuyer'] else "SPRZEDAŻ"
-                    message = f"✅ Ostatnia znana transakcja: {side} {current_trade['qty']} BTC @ {current_trade['price']} PLN"
+                    
+                    formatted_pln = f"{price_pln:.2f}"
+                    formatted_btc = f"{qty_btc:.8f}".rstrip('0').rstrip('.')
+                    formatted_time = time.strftime('%Y-%m-%d %H:%M:%S', time.localtime(current_trade['time'] / 1000))
+
+                    message = (
+                        f"✅ **Ostatnia znana transakcja** ✅\n\n"
+                        f"**Typ:** {side}\n"
+                        f"**Ilość:** {formatted_btc} BTC\n"
+                        f"**Cena:** {formatted_pln} PLN\n"
+                        f"**Czas:** {formatted_time}"
+                    )
                     
                     send_discord_message(message)
 
@@ -74,10 +88,22 @@ def main():
                     print(f"New trade detected! ID: {current_trade_id}", flush=True)
                     last_trade_id = current_trade_id
                     
-                    # Format the message for Discord
+                    # --- Message Formatting ---
+                    price_pln = float(current_trade['price'])
+                    qty_btc = float(current_trade['qty'])
                     side = "KUPNO" if current_trade['isBuyer'] else "SPRZEDAŻ"
                     
-                    message = f"🔔 NOWA TRANSAKCJA: {side} {current_trade['qty']} BTC @ {current_trade['price']} PLN"
+                    formatted_pln = f"{price_pln:.2f}"
+                    formatted_btc = f"{qty_btc:.8f}".rstrip('0').rstrip('.')
+                    formatted_time = time.strftime('%Y-%m-%d %H:%M:%S', time.localtime(current_trade['time'] / 1000))
+                    
+                    message = (
+                        f"🔔 **NOWA TRANSAKCJA** 🔔\n\n"
+                        f"**Typ:** {side}\n"
+                        f"**Ilość:** {formatted_btc} BTC\n"
+                        f"**Cena:** {formatted_pln} PLN\n"
+                        f"**Czas:** {formatted_time}"
+                    )
                     
                     send_discord_message(message)
             else:
