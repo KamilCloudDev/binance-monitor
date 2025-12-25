@@ -12,4 +12,4 @@ COPY monitor.py .
 # Pass environment variables at runtime, e.g.:
 # docker run -e BINANCE_API_KEY="key" -e BINANCE_API_SECRET="secret" -e DISCORD_WEBHOOK_URL="url" <image_name>
 
-CMD ["python", "monitor.py"]
+CMD ["python", "-u", "monitor.py"]

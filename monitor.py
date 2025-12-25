@@ -20,7 +20,7 @@ SYMBOL = "BTCPLN"
 def send_discord_message(message):
     """Sends a message to a Discord channel via a webhook."""
     if not DISCORD_WEBHOOK_URL:
-        print("Discord Webhook URL not found. Skipping notification.")
+        print("Discord Webhook URL not found. Skipping notification.", flush=True)
         return
     
     payload = {"content": message}
@@ -28,19 +28,28 @@ def send_discord_message(message):
     try:
         response = requests.post(DISCORD_WEBHOOK_URL, json=payload)
         response.raise_for_status()
-        print("Discord notification sent successfully.")
+        print("Discord notification sent successfully.", flush=True)
     except requests.exceptions.RequestException as e:
-        print(f"Failed to send Discord notification: {e}")
+        print(f"Failed to send Discord notification: {e}", flush=True)
+
+def send_startup_notification():
+    """Sends a notification that the bot has started."""
+    print("Sending startup notification to Discord.", flush=True)
+    send_discord_message("🤖 Bot monitorujący został uruchomiony.")
 
 def main():
     """Monitors Binance trades and sends Discord notifications."""
     if not API_KEY or not API_SECRET:
-        print("Binance API credentials not set. Have you created a .env file?")
+        print("Binance API credentials not set. Have you created a .env file?", flush=True)
         return
 
     client = Client(API_KEY, API_SECRET)
     last_trade_id = None
-    print(f"Starting to monitor trades for {SYMBOL}...")
+
+    # Send startup notification before the main loop
+    send_startup_notification()
+    
+    print(f"Starting to monitor trades for {SYMBOL}...", flush=True)
 
     while True:
         try:
@@ -49,20 +58,20 @@ def main():
                 current_trade = trades[0]
                 current_trade_id = current_trade['id']
 
-                print(f"Current last trade ID: {current_trade_id}")
+                print(f"Current last trade ID: {current_trade_id}", flush=True)
 
                 if last_trade_id is None:
                     # First run, send the most recent trade immediately
                     last_trade_id = current_trade_id
-                    print(f"Initial trade ID set to: {last_trade_id}. Sending startup notification.")
+                    print(f"Initial trade ID set to: {last_trade_id}. Sending last known trade.", flush=True)
                     
                     side = "KUPNO" if current_trade['isBuyer'] else "SPRZEDAŻ"
-                    message = f"✅ MONITOR URUCHOMIONY. Ostatnia transakcja: {side} {current_trade['qty']} BTC @ {current_trade['price']} PLN"
+                    message = f"✅ Ostatnia znana transakcja: {side} {current_trade['qty']} BTC @ {current_trade['price']} PLN"
                     
                     send_discord_message(message)
 
                 elif current_trade_id != last_trade_id:
-                    print(f"New trade detected! ID: {current_trade_id}")
+                    print(f"New trade detected! ID: {current_trade_id}", flush=True)
                     last_trade_id = current_trade_id
                     
                     # Format the message for Discord
@@ -72,10 +81,10 @@ def main():
                     
                     send_discord_message(message)
             else:
-                print("No trades found yet.")
+                print("No trades found yet.", flush=True)
 
         except Exception as e:
-            print(f"An error occurred: {e}")
+            print(f"An error occurred: {e}", flush=True)
 
         time.sleep(60)
 
