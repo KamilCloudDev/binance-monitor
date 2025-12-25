@@ -52,15 +52,23 @@ def main():
                 print(f"Current last trade ID: {current_trade_id}")
 
                 if last_trade_id is None:
+                    # First run, send the most recent trade immediately
                     last_trade_id = current_trade_id
-                    print(f"Initial trade ID set to: {last_trade_id}")
+                    print(f"Initial trade ID set to: {last_trade_id}. Sending startup notification.")
+                    
+                    side = "KUPNO" if current_trade['isBuyer'] else "SPRZEDAŻ"
+                    message = f"✅ MONITOR URUCHOMIONY. Ostatnia transakcja: {side} {current_trade['qty']} BTC @ {current_trade['price']} PLN"
+                    
+                    send_discord_message(message)
 
                 elif current_trade_id != last_trade_id:
                     print(f"New trade detected! ID: {current_trade_id}")
                     last_trade_id = current_trade_id
                     
+                    # Format the message for Discord
                     side = "KUPNO" if current_trade['isBuyer'] else "SPRZEDAŻ"
-                    message = f"🔔 ZMIANA STANU KONTA: {side} {current_trade['qty']} BTC @ {current_trade['price']} PLN"
+                    
+                    message = f"🔔 NOWA TRANSAKCJA: {side} {current_trade['qty']} BTC @ {current_trade['price']} PLN"
                     
                     send_discord_message(message)
             else:
